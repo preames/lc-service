@@ -1,0 +1,14 @@
+validate inputs
+check repo permissions
+checkout repository
+build it once
+run tests
+run clang-modernize
+build it again
+run tests
+run any other validation step
+send a pull request to the original repo
+
+update status all the way through
+
+# Note: Before starting this, check existing code to see if it provides useful starting point.

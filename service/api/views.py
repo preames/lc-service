@@ -10,16 +10,29 @@ def index(request):
 def start(request):
     if request.method not in ['GET', 'POST']:
         raise Http404;
-    return HttpResponse("START")
+    if not request.REQUEST["repository"]:
+        raise Http404;
+    tainted_repo = request.REQUEST["repository"]
+    # TODO: validate the repository is actual a github url
+    # TODO: validate it's in our whitelist (for now)
+    return HttpResponse("START " + tainted_repo)
 
 # Poll for the current status of an existing request
 def status(request):
     if request.method not in ['GET', 'POST']:
         raise Http404;
-    return HttpResponse("POLL")
+    if not request.REQUEST["id"]:
+        raise Http404;
+    tainted_id = request.REQUEST["id"]
+    # TODO: validate user permissions to this id 
+    return HttpResponse("POLL " + tainted_id)
 
 # Stop an existing request
 def stop(request):
     if request.method not in ['GET', 'POST']:
         raise Http404;
-    return HttpResponse("STOP")
+    if not request.REQUEST["id"]:
+        raise Http404;
+    tainted_id = request.REQUEST["id"]
+    # TODO: validate user permissions to this id 
+    return HttpResponse("STOP " + tainted_id)
