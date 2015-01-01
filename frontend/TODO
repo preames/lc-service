@@ -1,0 +1,11 @@
+Index page:
+- really basic, entry for repo, request type
+- validate input for reporting
+- send start command
+- on success -> status page
+- on failure -> repo error on page in helpful way
+
+status page - status/<request_id>/
+- summary of request
+- in place update of progress
+- link to successful pull request
