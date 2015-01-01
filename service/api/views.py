@@ -17,6 +17,9 @@ def start(request):
     tainted_repo = request.REQUEST["repository"]
     # TODO: validate the repository is actual a github url
     # TODO: validate it's in our whitelist (for now)
+
+    # TODO: should we try to combine with an existing pending job?
+
     # First, create a record in the request table for this job, then
     # actually send a message to the job server to request it be run
     request = Request.objects.create(datetime=datetime.datetime.now(), 

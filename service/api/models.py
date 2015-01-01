@@ -20,7 +20,7 @@ class LogMessage(models.Model):
 
     def __str__(self):
         return ", ".join([str(self.id), 
-                          str(self.request), 
+                          str(self.request.id), 
                           str(self.datetime), 
                           str(self.payload)])
 
