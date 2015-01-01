@@ -1,0 +1,19 @@
+# http://editorconfig.org
+
+root = true
+
+# Indent level of 4
+[*.{cpp,c,h,txt,py,js,html,css,md}]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# Travis likes indent level of 2
+[*.yml]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
