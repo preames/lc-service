@@ -50,7 +50,7 @@ def status(request):
     last = messages.order_by('pk').reverse()[0:1]
     if not last:
         return HttpResponse("POLL " + tainted_id + "No Messages")
-    payload = last.payload
+    payload = last[0].payload
     return HttpResponse("POLL " + tainted_id + str(payload))
 
 # Stop an existing request
