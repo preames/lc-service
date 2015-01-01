@@ -1,0 +1,8 @@
+<div class="repo-form col-md-12" ng-controller="RepoFormCtrl">
+  <form novalidate>
+    <label for="repository">Repository:</label>
+    <input id="repository" type="text" ng-model="repo.url" placeholder="https://github.com/username/project">
+    <!-- TODO: Add request type -->
+    <input id="submit-button" type="submit" value="Submit Request" ng-click="submit()">
+  </form>
+</div>

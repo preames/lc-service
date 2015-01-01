@@ -1,7 +1,10 @@
 angular.module('frontend', ['ui.bootstrap','ui.utils','ngRoute','ngAnimate']);
 
 angular.module('frontend').config(function($routeProvider) {
-
+    $routeProvider.when('/home', {
+        templateUrl: 'partial/repo-form/repo-form.html',
+        controller: 'RepoFormCtrl'
+    });
     /* Add New Routes Above */
     $routeProvider.otherwise({redirectTo:'/home'});
 
