@@ -22,12 +22,12 @@ def start(request):
 
     # First, create a record in the request table for this job, then
     # actually send a message to the job server to request it be run
-    request = Request.objects.create(datetime=datetime.datetime.now(), 
+    request = Request.objects.create(datetime=datetime.datetime.now(),
                                      repo=tainted_repo)
 
     message_dict = {"action": "job_start"}
     message_json = json.dumps(message_dict)
-    message = LogMessage.objects.create(request=request, 
+    message = LogMessage.objects.create(request=request,
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
 
@@ -40,7 +40,7 @@ def status(request):
     if not request.REQUEST["id"]:
         raise Http404;
     tainted_id = request.REQUEST["id"]
-    # TODO: validate user permissions to this id 
+    # TODO: validate user permissions to this id
     request = get_object_or_404(Request, id=tainted_id)
 
     # Find the last message related to this request.  We're taking advantage
@@ -60,14 +60,14 @@ def stop(request):
     if not request.REQUEST["id"]:
         raise Http404;
     tainted_id = request.REQUEST["id"]
-    # TODO: validate user permissions to this id 
+    # TODO: validate user permissions to this id
     request = get_object_or_404(Request, id=tainted_id)
 
     # TODO: Check to see if a stop request already sent, report an error
 
     message_dict = {"action": "job_stop"}
     message_json = json.dumps(message_dict)
-    message = LogMessage.objects.create(request=request, 
+    message = LogMessage.objects.create(request=request,
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
 
