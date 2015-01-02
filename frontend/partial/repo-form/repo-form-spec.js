@@ -3,19 +3,19 @@ describe('RepoFormCtrl', function() {
 
     var $scope,
         ctrl,
-        window;
+        api;
     beforeEach(inject(function($rootScope, $controller) {
         $scope = $rootScope.$new();
-        window = jasmine.createSpyObj('window', [ 'alert' ]);
-        ctrl = $controller('RepoFormCtrl', { $scope: $scope, $window: window });
+        api = jasmine.createSpyObj('api', [ 'start' ]);
+        ctrl = $controller('RepoFormCtrl', { $scope: $scope, api: api});
     }));
 
-    it('should display an alert on form submission', inject(function() {
+    it('should start a job on form submission', inject(function() {
         var url = 'https://github.com/LegalizeAdulthood/iterated-dynamics';
         $scope.repo.url = url;
 
         $scope.submit();
 
-        expect(window.alert).toHaveBeenCalledWith(url);
+        expect(api.start).toHaveBeenCalledWith(url);
     }));
 });
