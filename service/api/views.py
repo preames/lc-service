@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from models import *
@@ -9,6 +10,8 @@ def index(request):
     raise Http404;
 
 # Kick off a new request
+// TODO: figure out a better development solution than disabling CSRF
+@csrf_exempt
 def start(request):
     if request.method not in ['GET', 'POST']:
         raise Http404;
