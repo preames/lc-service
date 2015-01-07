@@ -36,10 +36,10 @@ def pending_jobs():
         if action == "job_start":
             assert not message.request.id in jobs
             jobs[message.request.id] = True
-        elif action in ["job_started", "job_finish", "job_stop"]:
+        elif action in ["job_started", "job_finished", "job_stop"]:
             assert message.request.id in jobs
             jobs[message.request.id] = False
-        elif action in ["job_finish"]:
+        elif action in ["job_finished"]:
             assert message.request.id in jobs
             assert not jobs[message.request.id]
 
