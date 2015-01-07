@@ -10,7 +10,7 @@ def index(request):
     raise Http404;
 
 # Kick off a new request
-// TODO: figure out a better development solution than disabling CSRF
+# TODO: figure out a better development solution than disabling CSRF
 @csrf_exempt
 def start(request):
     if request.method not in ['GET', 'POST']:
@@ -37,6 +37,8 @@ def start(request):
     return HttpResponse("START " + tainted_repo + " --> " + str(request.id))
 
 # Poll for the current status of an existing request
+# TODO: figure out a better development solution than disabling CSRF
+@csrf_exempt
 def status(request):
     if request.method not in ['GET', 'POST']:
         raise Http404;
@@ -57,6 +59,8 @@ def status(request):
     return HttpResponse("POLL " + tainted_id + str(payload))
 
 # Stop an existing request
+# TODO: figure out a better development solution than disabling CSRF
+@csrf_exempt
 def stop(request):
     if request.method not in ['GET', 'POST']:
         raise Http404;
