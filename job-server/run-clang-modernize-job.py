@@ -31,10 +31,32 @@ try:
     origcwd = os.getcwd()
     try:
         os.chdir(tmpdir)
-        
+
         if not build_it():
-            print "build failed"
+            print "initial build failed"
             sys.exit(-1)
+            
+        # clang-modernize every file listed in the cmake compilation
+        # database
+        subprocess.check_call("clang-modernize -p ./ -include ./", 
+                                  shell=True)
+
+        # TODO: if there is no diff, early exit
+
+        # do a full build and make sure it passes.  IF it doesn't, we 
+        # don't want to keep this.  TODO: We'll need to be robust against
+        # failures in the future, but for now, don't mess with it.
+        if not build_it():
+            print "build failed after format"
+            sys.exit(-1)
+
+        # TODO: other validation
+
+        # TODO: delivery options
+
+        # For now, just show the diff
+        print "Here's the diff:"
+        subprocess.call("git --no-pager diff", shell=True)
 
     finally:
         # restore working dir

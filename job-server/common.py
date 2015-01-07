@@ -37,7 +37,8 @@ def build_it(require_build=True, require_tests=False):
     # a temporary checkout.
     if os.path.exists("./CMakeLists.txt"):
         print "Running cmake"
-        if 0 != subprocess.call("cmake .", shell=True,
+        if 0 != subprocess.call("cmake -D CMAKE_EXPORT_COMPILE_COMMANDS=true .", 
+                                shell=True,
                                 stderr = subprocess.STDOUT):
             return False
     elif os.path.exists("./configure"):
