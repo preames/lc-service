@@ -55,7 +55,10 @@ def status(request):
     last = messages.order_by('pk').reverse()[0:1]
     if not last:
         return HttpResponse("POLL " + tainted_id + "No Messages")
-    payload = last[0].payload
+    payload_dict = {}
+    for message in messages:
+        payload_dict[str(message.datetime)] = str(message.payload)
+    payload = json.dumps(payload_dict)
     return HttpResponse("POLL " + tainted_id + str(payload))
 
 # Stop an existing request

@@ -69,14 +69,24 @@ def run_job(request, jobtype):
     message_dict = {"action": "job_started"}
     add_message_to_log(message_dict, request)
 
+    # TODO: async using popen and observe jobs
     # TODO: logging, log files?
-    if "clang-modernize" == jobtype:
+    if "echo" == jobtype:
+        print "echo: " + str(request)
+    elif "clang-modernize" == jobtype:
         # TODO: add various other interesting options
         print "job type unsupported"
         #cmd = "python run-clang-modernize-job.py %s" % (repo)
         # TODO: set cwd
-        # TODO: async using popen and observe jobs
         #subprocess.call(cmd)
+        pass
+    elif "build" == jobtype:
+        repo = request.repo
+        # TODO: add various other interesting options
+        cmd = "python run-build-only-job.py %s" % (repo)
+        # TODO: set cwd
+        # TODO: remove shell=True via explicit command path
+        subprocess.call(cmd, shell=True)#
         pass
     elif "clang-tidy" == jobtype:
         print "job type unsupported"
@@ -84,7 +94,6 @@ def run_job(request, jobtype):
     elif "clang-format" == jobtype:
         #cmd = "python run-clang-modernize-job.py %s" % (repo)
         # TODO: set cwd
-        # TODO: async using popen and observe jobs
         #subprocess.call(cmd)
         print "job type unsupported"
         pass
@@ -118,7 +127,7 @@ while datetime.datetime.now() < started + datetime.timedelta(minutes=120):
         # Note: Need to rate limit the work somehow, for now, this is 
         # handled by having a single blocking call per job
     
-        run_job(request, "clang-format")
+        run_job(request, "build")
         
 
     #TODO: implement various job manager commands
