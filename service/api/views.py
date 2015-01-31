@@ -33,7 +33,7 @@ def start(request):
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
 
-    return HttpResponse("START " + tainted_repo + " --> " + str(request.id))
+    return HttpResponse(json.dumps({"repo": tainted_repo, "id": request.id}))
 
 # Poll for the current status of an existing request
 # TODO: figure out a better development solution than disabling CSRF
