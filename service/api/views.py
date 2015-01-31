@@ -7,16 +7,16 @@ import datetime
 
 # By default, any unmapped URL hits this and gets a page not found
 def index(request):
-    raise Http404;
+    raise Http404
 
 # Kick off a new request
 # TODO: figure out a better development solution than disabling CSRF
 @csrf_exempt
 def start(request):
     if request.method not in ['GET', 'POST']:
-        raise Http404;
+        raise Http404
     if not request.REQUEST["repository"]:
-        raise Http404;
+        raise Http404
     tainted_repo = request.REQUEST["repository"]
     # TODO: validate the repository is actual a github url
     # TODO: validate it's in our whitelist (for now)
@@ -41,9 +41,9 @@ def start(request):
 @csrf_exempt
 def status(request):
     if request.method not in ['GET', 'POST']:
-        raise Http404;
+        raise Http404
     if not request.REQUEST["id"]:
-        raise Http404;
+        raise Http404
     tainted_id = request.REQUEST["id"]
     # TODO: validate user permissions to this id
     request = get_object_or_404(Request, id=tainted_id)
@@ -66,9 +66,9 @@ def status(request):
 @csrf_exempt
 def stop(request):
     if request.method not in ['GET', 'POST']:
-        raise Http404;
+        raise Http404
     if not request.REQUEST["id"]:
-        raise Http404;
+        raise Http404
     tainted_id = request.REQUEST["id"]
     # TODO: validate user permissions to this id
     request = get_object_or_404(Request, id=tainted_id)
