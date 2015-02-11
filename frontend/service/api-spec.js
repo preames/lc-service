@@ -33,13 +33,14 @@ describe('api', function() {
     });
 
     it('should resolve promise to status value when start succeeds', function() {
-        var success = jasmine.createSpy('success');
-        expectStart().respond(200, { status: false });
+        var success = jasmine.createSpy('success'),
+	    response = { "repo": "tainted_repo", "id": 666 };
+        expectStart().respond(200, response);
 
         api.start(url).then(success);
         $http.flush();
 
-        expect(success).toHaveBeenCalledWith(false);
+        expect(success).toHaveBeenCalledWith(response);
     });
 
     it('should reject promise with object on http error', function() {

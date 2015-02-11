@@ -8,7 +8,7 @@ angular.module('frontend').factory('api', function($http, $q) {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).then(function(response) {
-                deferred.resolve(response.data.status);
+                deferred.resolve(response.data);
             }, function(response) {
                 deferred.reject(response);
             });
