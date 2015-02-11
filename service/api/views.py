@@ -47,7 +47,7 @@ def start(request):
     message = LogMessage.objects.create(request=request,
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
-    response_dict = {"repository": tainted_repo, "id": request.id, 
+    response_dict = {"repository": tainted_repo, "id": request.id,
                      'job_type' : job_type}
     return HttpResponse(json.dumps(response_dict),
                         content_type='application/json')
