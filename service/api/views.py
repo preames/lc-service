@@ -1,4 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 from models import *
 import json
@@ -16,9 +17,23 @@ def start(request):
         raise Http404
     if not request.REQUEST["repository"]:
         raise Http404
+    for item in request.REQUEST.keys():
+        print item
+        if str(item) not in ['repository', 'job_type']:
+            raise Http404
     tainted_repo = request.REQUEST["repository"]
+    if tainted_repo == "":
+        raise Http404
     # TODO: validate the repository is actual a github url
     # TODO: validate it's in our whitelist (for now)
+
+    if "job_type" in request.REQUEST.keys():
+        job_type = request.REQUEST["job_type"]
+    else:
+        job_type = "clang-tidy"
+    
+    if job_type not in ['clang-format', 'clang-modernize', 'clang-tidy']:
+        raise Http404
 
     # TODO: should we try to combine with an existing pending job?
 
