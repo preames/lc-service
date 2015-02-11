@@ -2,6 +2,9 @@
 # API.  These are dliberately written to test the external API.  Additional
 # tests can be added as Django view tests, but we should make sure basic
 # functionality works.
+# Note: The tests in this file shoudn't require the job-server to be running.
+# Only the actual web-server should be required.  Full integration tests
+# should be elsewhere.
 
 import json
 from urllib import *
@@ -64,8 +67,11 @@ def test_basic():
     print [retcode, json]
 
 def test_stop():
+    # The job server won't try to run a nop-skip job so we can
+    # test to make sure stop functionality works because it's the
+    # only possible status change.
     [retcode, json] = API().start({'repository' : 'foo', 
-                                   'job_type' : 'clang-tidy' })
+                                   'job_type' : 'nop-skip' })
     print [retcode, json]
     request_id = json['id']
     [retcode, json] = API().stop({'id' : request_id})
@@ -73,7 +79,6 @@ def test_stop():
     [retcode, json] = API().status({'id' : request_id})
     print [retcode, json]
     # Note: The job may have run, can't test for job_stop
-
 
 test_basic()
 test_stop()

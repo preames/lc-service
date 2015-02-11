@@ -43,7 +43,6 @@ def pending_jobs():
             assert message.request.id in jobs
             assert not jobs[message.request.id]
 
-
     for key, value in jobs.items():
         # A true value implies this job hasn't yet run...
         if value:
@@ -62,6 +61,11 @@ def add_message_to_log(message_dict, request):
 
 def run_job(request, jobtype):
     print "Running job: " + jobtype + " " +str(request)
+
+    if "nop-skip" == jobtype:
+        # used when testing the frontend, we just ignore it. We do not
+        # want to adjust the status here.
+        return
     
     # Before actually starting the job, record the fact we're about to do so.
     # If we see this job in the log after a restart, we don't want it to 

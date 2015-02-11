@@ -31,7 +31,8 @@ def start(request):
     else:
         job_type = "clang-tidy"
     
-    if job_type not in ['clang-format', 'clang-modernize', 'clang-tidy']:
+    # nop-skip - ignored by the job server, used for testing response of api
+    if job_type not in ['nop-skip', 'build', 'clang-format', 'clang-modernize', 'clang-tidy']:
         raise Http404
 
     # TODO: should we try to combine with an existing pending job?
