@@ -11,11 +11,17 @@ class API:
         url = url + "?" +  urlencode(args)
         response = urlopen(url)
         raw_data = response.read().decode('utf-8')
-        return [response.getcode(), raw_data]
-        #return json.loads(raw_data)
+        if response.getcode() == 200:
+            return [response.getcode(), json.loads(raw_data)]
+        else:
+            return [response.getcode(), raw_data]
 
     def start(self, args):
         return self.request('http://127.0.0.1:8000/api/start', args)
+    def status(self, args):
+        return self.request('http://127.0.0.1:8000/api/status', args)
+    def stop(self, args):
+        return self.request('http://127.0.0.1:8000/api/stop', args)
 
 def expect_error(response):
     print response[0]
@@ -46,5 +52,16 @@ def test_start():
     expect_error(API().start({'repository' : 'foo',
                               'job_type' : 'garbage'}))
 
+def test_basic():
+    [retcode, json] = API().start({'repository' : 'foo', 
+                                   'job_type' : 'clang-tidy' })
+    print [retcode, json]
+    request_id = json['id']
+    [retcode, json] = API().status({'id' : request_id})
+    print [retcode, json]
+    [retcode, json] = API().stop({'id' : request_id})
+    print [retcode, json]
+
+test_basic()
 test_start()
 

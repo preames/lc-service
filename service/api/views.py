@@ -46,9 +46,10 @@ def start(request):
     message = LogMessage.objects.create(request=request,
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
-
-    return HttpResponse(json.dumps({"repo": tainted_repo, "id": request.id}),
-	content_type='application/json')
+    response_dict = {"repository": tainted_repo, "id": request.id, 
+                     'job_type' : job_type}
+    return HttpResponse(json.dumps(response_dict),
+                        content_type='application/json')
 
 # Poll for the current status of an existing request
 # TODO: figure out a better development solution than disabling CSRF
@@ -72,8 +73,10 @@ def status(request):
     payload_dict = {}
     for message in messages:
         payload_dict[str(message.datetime)] = str(message.payload)
-    payload = json.dumps(payload_dict)
-    return HttpResponse("POLL " + tainted_id + str(payload))
+    response_dict = {'input id' : tainted_id, 'request id' : request.id,
+                     'updates' : payload_dict}
+    return HttpResponse(json.dumps(response_dict),
+                        content_type='application/json')
 
 # Stop an existing request
 # TODO: figure out a better development solution than disabling CSRF
@@ -96,4 +99,6 @@ def stop(request):
                                         payload=message_json)
 
 
-    return HttpResponse("STOP " + tainted_id + ", " + str(request.id))
+    response_dict = {'input id' : tainted_id, 'request id' : request.id }
+    return HttpResponse(json.dumps(response_dict),
+                        content_type='application/json')
