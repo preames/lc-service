@@ -18,7 +18,6 @@ def start(request):
     if not request.REQUEST["repository"]:
         raise Http404
     for item in request.REQUEST.keys():
-        print item
         if str(item) not in ['repository', 'job_type']:
             raise Http404
     tainted_repo = request.REQUEST["repository"]
