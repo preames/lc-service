@@ -1,10 +1,27 @@
 <div class="repo-form col-md-12" ng-controller="RepoFormCtrl">
   <form novalidate>
     <label for="repository">Repository:</label>
-    <input id="repository" type="text" ng-model="repo.url" placeholder="https://github.com/username/project">
+    <input id="repository" type="text" ng-model="repo.url" size="80" placeholder="https://github.com/username/project">
     <!-- TODO: Add request type -->
     <input id="submit-button" type="submit" value="Submit Request" ng-click="submit()">
   </form>
 
-  <p ng-show="status" class="ng-hide">Status: {{status}}</p>
+  <div ng-show="status" class="ng-hide">
+
+  <div>
+    <table>
+    <tr>
+    <td>Repository:</td>
+    <td>{{status.repo}}</td>
+    </tr>
+    <tr>
+    <td>Job Type:</td>
+    <td>{{status.job_type}}</td>
+    </tr>
+    <tr>
+    <td>Id:</td>
+    <td>{{status.id}}</td>
+    </tr>
+    </table>
+  </div>
 </div>

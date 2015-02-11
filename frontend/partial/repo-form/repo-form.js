@@ -3,11 +3,10 @@ angular.module('frontend').controller('RepoFormCtrl', function($scope, api) {
     $scope.submit = function() {
         // TODO: client side validate repo url for pretty error report
         api.start($scope.repo.url).then(function(response) {
-	    $scope.status = JSON.stringify(response);
+	    $scope.status = response;
 	}, function(error) {
 	    throw error;
 	});
-        // issue a json request to the server
         // switch to status page on success, report error?
     };
 });
