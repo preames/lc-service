@@ -4,10 +4,14 @@ from django.http import HttpResponse, Http404
 from models import *
 import json
 import datetime
+import logging
 
 # By default, any unmapped URL hits this and gets a page not found
 def index(request):
     raise Http404
+
+def JsonResponse(obj):
+    return HttpResponse(json.dumps(obj), content_type='application/json')
 
 # Kick off a new request
 # TODO: figure out a better development solution than disabling CSRF
@@ -32,7 +36,8 @@ def start(request):
         job_type = "clang-tidy"
     
     # nop-skip - ignored by the job server, used for testing response of api
-    if job_type not in ['nop-skip', 'build', 'clang-format', 'clang-modernize', 'clang-tidy']:
+    if job_type not in ['nop-skip', 'build', 'echo', 'clang-format', 'clang-modernize', 'clang-tidy']:
+        print 'Job type ' + job_type + ' unknown.'
         raise Http404
 
     # TODO: should we try to combine with an existing pending job?
@@ -42,15 +47,12 @@ def start(request):
     request = Request.objects.create(datetime=datetime.datetime.now(),
                                      repo=tainted_repo)
 
-    message_dict = {"action": "job_start"}
+    message_dict = {"action": "job_start", "job_type": job_type}
     message_json = json.dumps(message_dict)
     message = LogMessage.objects.create(request=request,
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
-    response_dict = {"repository": tainted_repo, "id": request.id,
-                     'job_type' : job_type}
-    return HttpResponse(json.dumps(response_dict),
-                        content_type='application/json')
+    return JsonResponse({"repository": tainted_repo, "id": request.id, "job_type": job_type})
 
 # Poll for the current status of an existing request
 # TODO: figure out a better development solution than disabling CSRF
@@ -70,14 +72,13 @@ def status(request):
     messages = LogMessage.objects.all().filter(request=request)
     last = messages.order_by('pk').reverse()[0:1]
     if not last:
-        return HttpResponse("POLL " + tainted_id + "No Messages")
-    payload_dict = {}
+        return JsonResponse({})
+    payloads = []
     for message in messages:
-        payload_dict[str(message.datetime)] = str(message.payload)
-    response_dict = {'input id' : tainted_id, 'request id' : request.id,
-                     'updates' : payload_dict}
-    return HttpResponse(json.dumps(response_dict),
-                        content_type='application/json')
+        payload = json.loads(message.payload)
+        payload["datetime"] = str(message.datetime)
+        payloads.append(payload)
+    return JsonResponse(payloads)
 
 # Stop an existing request
 # TODO: figure out a better development solution than disabling CSRF
@@ -100,6 +101,4 @@ def stop(request):
                                         payload=message_json)
 
 
-    response_dict = {'input id' : tainted_id, 'request id' : request.id }
-    return HttpResponse(json.dumps(response_dict),
-                        content_type='application/json')
+    return JsonResponse({'input id' : tainted_id, 'request id' : request.id })

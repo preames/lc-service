@@ -2,26 +2,26 @@
   <form novalidate>
     <label for="repository">Repository:</label>
     <input id="repository" type="text" ng-model="repo.url" size="80" placeholder="https://github.com/username/project">
-    <!-- TODO: Add request type -->
-    <input id="submit-button" type="submit" value="Submit Request" ng-click="submit()">
+    <label for="job_type">Job Type:</label>
+    <select id="job_type" ng-model="repo.job_type">
+      <option value="build">build</option>
+      <option value="echo">echo</option>
+      <option value="clang-format">clang-format</option>
+      <option value="clang-modernize">clang-modernize</option>
+      <option value="clang-tidy" selected>clang-tidy</option>
+    </select>
+    <div ng-show="job.id" class="ng-hide">Job Id: {{job.id}}</div>
+    <div ng-show="job.events" class="ng-hide">Build Events:
+      <table>
+        <tr>
+          <th>Time</th>
+          <th>Action</th>
+        </tr>
+        <tr ng-repeat="evt in job.events">
+          <td>{{evt.datetime}}</td>
+          <td>{{evt.action}}</td></tr>
+      </table>
+    </div>
+    <input ng-show="!job.id" id="submit-button" type="submit" value="Submit Request" ng-click="submit()">
   </form>
-
-  <div ng-show="status" class="ng-hide">
-
-  <div>
-    <table>
-    <tr>
-    <td>Repository:</td>
-    <td>{{status.repo}}</td>
-    </tr>
-    <tr>
-    <td>Job Type:</td>
-    <td>{{status.job_type}}</td>
-    </tr>
-    <tr>
-    <td>Id:</td>
-    <td>{{status.id}}</td>
-    </tr>
-    </table>
-  </div>
 </div>

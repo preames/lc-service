@@ -1,7 +1,8 @@
 describe('api', function() {
     var api,
         $http,
-        url = 'https://github.com/LegalizeAdulthood/iterated-dynamics';
+        url = 'https://github.com/LegalizeAdulthood/iterated-dynamics',
+	job_type = 'clang-tidy';
 
     beforeEach(module('frontend'));
 
@@ -21,23 +22,23 @@ describe('api', function() {
 
     function expectStart() {
         return $http.expectPOST('/api/start',
-            "repository=" + encodeURIComponent(url),
+            "repository=" + encodeURIComponent(url) + "&job_type=" + encodeURIComponent(job_type),
             isFormDataContent);
     }
 
     it('should post repository URL to /api/start', function() {
         expectStart().respond(200, { status: true });
 
-        api.start(url);
+        api.start(url, job_type);
         $http.flush();
     });
 
     it('should resolve promise to status value when start succeeds', function() {
         var success = jasmine.createSpy('success'),
-	    response = { "repo": "tainted_repo", "id": 666 };
+	    response = { "repo": "tainted_repo", "job_type": "clang-tidy", "id": 666 };
         expectStart().respond(200, response);
 
-        api.start(url).then(success);
+        api.start(url, job_type).then(success);
         $http.flush();
 
         expect(success).toHaveBeenCalledWith(response);
@@ -47,9 +48,20 @@ describe('api', function() {
         var error = jasmine.createSpy('error');
         expectStart().respond(404);
 
-        api.start(url).then(function() {}, error);
+        api.start(url, job_type).then(function() {}, error);
         $http.flush();
 
         expect(error).toHaveBeenCalledWith(jasmine.any(Object));
+    });
+
+    it('should post to /api/status to get job status', function() {
+        var success = jasmine.createSpy('success'),
+            response = { "timestamp": "event" };
+        $http.expectPOST('/api/status').respond(200, response);
+
+        api.status(555).then(success);
+        $http.flush();
+
+        expect(success).toHaveBeenCalledWith(response);
     });
 });
