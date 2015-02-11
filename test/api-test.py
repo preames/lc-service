@@ -58,10 +58,24 @@ def test_basic():
     print [retcode, json]
     request_id = json['id']
     [retcode, json] = API().status({'id' : request_id})
+    # TODO: validate job_start found
     print [retcode, json]
     [retcode, json] = API().stop({'id' : request_id})
     print [retcode, json]
 
+def test_stop():
+    [retcode, json] = API().start({'repository' : 'foo', 
+                                   'job_type' : 'clang-tidy' })
+    print [retcode, json]
+    request_id = json['id']
+    [retcode, json] = API().stop({'id' : request_id})
+    print [retcode, json]
+    [retcode, json] = API().status({'id' : request_id})
+    print [retcode, json]
+    # Note: The job may have run, can't test for job_stop
+
+
 test_basic()
+test_stop()
 test_start()
 
