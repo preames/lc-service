@@ -1,5 +1,5 @@
 angular.module('frontend').controller('RepoFormCtrl', function($scope, api, $interval) {
-    $scope.repo = {};
+    $scope.repo = { job_type: "clang-tidy" };
     $scope.submit = function() {
         var timerId;
         // TODO: client side validate repo url for pretty error report

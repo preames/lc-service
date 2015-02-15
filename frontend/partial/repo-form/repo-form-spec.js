@@ -15,6 +15,11 @@ describe('RepoFormCtrl', function() {
         ctrl = $controller('RepoFormCtrl', {$scope: $scope, api: api});
     }));
 
+    it('should set the job_type to clang-tidy', function() {
+        expect($scope.repo).toBeDefined();
+        expect($scope.repo.job_type).toBe("clang-tidy");
+    });
+
     it('should start a job on form submission', function() {
         var url = 'https://github.com/LegalizeAdulthood/iterated-dynamics',
             deferred = $q.defer(),
