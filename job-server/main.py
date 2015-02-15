@@ -30,8 +30,7 @@ def pending_jobs():
     messages = models.LogMessage.objects.all()
     jobs = dict()
     for message in messages:
-        payload = message.payload
-        data = json.loads(payload)
+        data = json.loads(message.payload)
         action = data["action"]
         if action == "job_start":
             assert not message.request.id in jobs
