@@ -49,6 +49,7 @@ def pending_jobs():
             # TODO: shed if too old or load too high
             # TODO: error handling
             request = models.Request.objects.get(pk=key)
+            request.parameters = json.loads(request.parameters)
             yield request
 
 def add_message_to_log(message_dict, request):
@@ -59,7 +60,8 @@ def add_message_to_log(message_dict, request):
     print "logged: " + str(message)
 
 
-def run_job(job, jobtype):
+def run_job(job):
+    jobtype = job.parameters["job_type"]
     print "Running job: " + jobtype + " " +str(job)
 
     if "nop-skip" == jobtype:
@@ -114,7 +116,7 @@ while datetime.datetime.now() < started + datetime.timedelta(minutes=120):
         # Note: Need to rate limit the work somehow, for now, this is 
         # handled by having a single blocking call per job
     
-        run_job(job, "clang-modernize")
+        run_job(job)
         
 
     #TODO: implement various job manager commands

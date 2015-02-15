@@ -42,17 +42,21 @@ def start(request):
 
     # TODO: should we try to combine with an existing pending job?
 
+    message_dict = {"action": "job_start", "job_type": job_type, "repository": tainted_repo }
+    message_json = json.dumps(message_dict)
+
     # First, create a record in the request table for this job, then
     # actually send a message to the job server to request it be run
     request = Request.objects.create(datetime=datetime.datetime.now(),
-                                     repo=tainted_repo)
-
-    message_dict = {"action": "job_start", "job_type": job_type}
+                                     repo=tainted_repo,
+                                     parameters=message_json)
+    message_dict["id"] = request.id
     message_json = json.dumps(message_dict)
+
     message = LogMessage.objects.create(request=request,
                                         datetime=datetime.datetime.now(),
                                         payload=message_json)
-    return JsonResponse({"repository": tainted_repo, "id": request.id, "job_type": job_type})
+    return JsonResponse(message_dict)
 
 # Poll for the current status of an existing request
 # TODO: figure out a better development solution than disabling CSRF
