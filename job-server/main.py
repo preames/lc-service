@@ -59,8 +59,8 @@ def add_message_to_log(message_dict, request):
     print "logged: " + str(message)
 
 
-def run_job(request, jobtype):
-    print "Running job: " + jobtype + " " +str(request)
+def run_job(job, jobtype):
+    print "Running job: " + jobtype + " " +str(job)
 
     if "nop-skip" == jobtype:
         # used when testing the frontend, we just ignore it. We do not
@@ -71,32 +71,18 @@ def run_job(request, jobtype):
     # If we see this job in the log after a restart, we don't want it to 
     # rerun (since it may have caused us to crash in the first place)
     message_dict = {"action": "job_started"}
-    add_message_to_log(message_dict, request)
+    add_message_to_log(message_dict, job)
 
     # TODO: async using popen and observe jobs
     # TODO: logging, log files?
     # TODO: set cwd
     # TODO: remove shell=True via explicit command path
-    if "echo" == jobtype:
-        print "echo: " + str(request)
-    elif "clang-modernize" == jobtype:
-        repo = request.repo
-        cmd = "python run-clang-modernize-job.py %s" % (repo)
-        subprocess.call(cmd, shell=True)#
-        pass
-    elif "build" == jobtype:
-        repo = request.repo
-        cmd = "python run-build-only-job.py %s" % (repo)
-        subprocess.call(cmd, shell=True)#
-        pass
-    elif "clang-tidy" == jobtype:
-        print "job type unsupported"
-        pass
-    elif "clang-format" == jobtype:
-        #cmd = "python run-clang-modernize-job.py %s" % (repo)
-        # TODO: set cwd
-        #subprocess.call(cmd)
-        print "job type unsupported"
+    if jobtype == "echo":
+        print "echo: " + str(job)
+    elif jobtype == "build" or jobtype == "clang-modernize" or jobtype == "clang-tidy" or jobtype == "clang-format":
+        repo = job.repo
+        cmd = "python run-%s-job.py %s" % (jobtype, repo)
+        subprocess.call(cmd, shell=True)
         pass
     else:
         print "error: illegal job type!"
@@ -104,7 +90,7 @@ def run_job(request, jobtype):
     # Record the fact the job finished (normally)
     # TODO: add 'job_aborted'
     message_dict = {"action": "job_finished"}
-    add_message_to_log(message_dict, request)
+    add_message_to_log(message_dict, job)
 
 
 print "Entering job-server loop"
@@ -122,13 +108,13 @@ while datetime.datetime.now() < started + datetime.timedelta(minutes=120):
 
     # Batch process pending job requests - this is currently strictly FIFO,
     # but more complicated policies can and should be applied.
-    for request in pending_jobs():
-        print "pending: " + str(request)
+    for job in pending_jobs():
+        print "pending: " + str(job)
         
         # Note: Need to rate limit the work somehow, for now, this is 
         # handled by having a single blocking call per job
     
-        run_job(request, "clang-modernize")
+        run_job(job, "clang-modernize")
         
 
     #TODO: implement various job manager commands

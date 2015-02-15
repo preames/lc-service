@@ -1,13 +1,17 @@
+import json
 import os
-import shutil
 import subprocess
+import shutil
 import sys
 from common import create_working_dir, clone_repository, build_it, display_diff
 
+
 def run_job():
-    # clang-modernize every file listed in the cmake compilation
+    commands = json.load(open("compile_commands.json"))
+    # clang-tidy every file listed in the cmake compilation
     # database
-    subprocess.check_call("clang-modernize -p ./ -include ./",
+    for cmd in commands:
+         subprocess.check_call("/home/richard/dev/clang/git/my-build/bin/clang-tidy -p . -checks= -fix %s" % (cmd["file"]),
                           shell=True)
 
 
@@ -41,7 +45,6 @@ def main(argv):
             # failures in the future, but for now, don't mess with it.
             if not build_it():
                 print "build failed after format"
-                sys.exit(-1)
 
             # TODO: other validation
 

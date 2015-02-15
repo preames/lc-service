@@ -78,3 +78,61 @@ def build_it(require_build=True, require_tests=False):
         print "No known way to build this project"
         return False
 
+
+def create_working_dir():
+    # create a local tempory directory
+    import tempfile
+    # TODO: this is insecure FIXME
+    tmpdir = tempfile.mktemp()
+    # Note: The directory does not exist here, this is only the name
+
+    os.mkdir(tmpdir)
+    return tmpdir
+
+
+def clone_repository(repo, work_dir):
+    # clone the repository
+    cmd = "git --no-pager clone %s %s" % (repo, work_dir)
+    subprocess.call(cmd, shell=True)
+
+
+def display_diff():
+    # TODO: multiple delivery options
+    # 1) diff via email
+    # 2) commit and push
+    # 3) repo fork and pull request
+    # 4) publish diff to known location (website)
+    #    formatted nicely, with raw patch for apply
+    #    generate a json output file, parse this to make
+    #    a pretty webpage later.  Put the diffs into own subtree
+
+    output_format = "diff-web"
+    if output_format == "diff-web":
+        # For now, just show the diff
+        print "Here's the diff:"
+        subprocess.call("git --no-pager diff", shell=True)
+
+        # make a output sub-directory
+        # os.mkdir("./.livingcode-output")
+        # single unified diff
+        # subprocess.call("git --no-pager diff > ./.livingcode-output/combined.diff", shell=True)
+        # per file diff with unique file
+        # for i in xrange(len(formatted)):
+        #     subprocess.call("git --no-pager diff %s > ./.livingcode-output/%d.diff" % (formatted[i],i), shell=True)
+        # temporary, show the dir tree since we're about to delete it
+        # subprocess.call("wc ./.livingcode-output/*", shell=True)
+        # TODO: generate json file listing all
+        # TODO: preserve the output tree
+        pass
+    elif output_format == "diff-email":
+        # not yet implemented
+        assert False
+    elif output_format == "commit-push":
+        # do a local commit
+        subprocess.check_call("git --no-pager commit -a -m \"Applying automatic formatting changes via clang-format for files which haven't been touched recently\"", shell=True)
+
+        # pull rebase -- if it's not up to date, BAIL - long term be more sophsticated
+        # do a push (eventually)
+    else:
+        # unknown out requested
+        assert False
