@@ -10,6 +10,10 @@ import logging
 def index(request):
     raise Http404
 
+url_whitelist = ['https://github.com/LegalizeAdulthood/refactor-test-suite',
+                 'https://github.com/llvm-mirror/llvm',
+                 ]
+
 def JsonResponse(obj):
     return HttpResponse(json.dumps(obj), content_type='application/json')
 
@@ -33,8 +37,11 @@ def start(request):
     tainted_repo = request.REQUEST["repository"]
     if tainted_repo == "":
         raise Http404
+
     # TODO: validate the repository is actual a github url
-    # TODO: validate it's in our whitelist (for now)
+    # validate it's in our whitelist (for now)
+    if tainted_repo not in url_whitelist:
+        raise Http404
 
     if "job_type" in request.REQUEST.keys():
         job_type = request.REQUEST["job_type"]
