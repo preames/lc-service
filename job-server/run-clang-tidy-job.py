@@ -48,9 +48,13 @@ def main(argv):
 
             # TODO: other validation
 
-            # TODO: delivery options
+            fname = "temp.diff"
+            git_diff_to_file(fname)
+            with open(fname, 'r') as ofile:
+                print ofile.read()
 
-            display_diff()
+            # TODO: move the diff file somewhere outside the temp directory
+            # and save it
 
         finally:
             # restore working dir

@@ -2,9 +2,36 @@ import os
 import subprocess
 import shutil
 import sys
+import json
+import datetime
 
 import multiprocessing
 cpu_count = multiprocessing.cpu_count()
+
+common_setup_has_run = False
+def common_setup():
+    # This global is used for sanity checking, *not* synchronization!
+    global common_setup_has_run
+    assert False == common_setup_has_run
+    common_setup_has_run = True
+
+    import django
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "service.settings")
+    # Note: PYTHONPATH needs to point at lc-service/service/
+    django.setup()
+
+
+def add_message_to_log(message_dict, request):
+    global common_setup_has_run
+    assert common_setup_has_run
+    from api import models
+    message_json = json.dumps(message_dict)
+    message = models.LogMessage.objects.create(request=request, 
+                                               datetime=datetime.datetime.now(),
+                                               payload=message_json)
+    print "logged: " + str(message)
+
+
 
 # really should use a three way here
 def try_make_target_impl(options, target):

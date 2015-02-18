@@ -4,6 +4,10 @@ import subprocess
 import sys
 from common import create_working_dir, clone_repository, build_it, display_diff
 
+diff_base_dir = '/tmp/lc-diffs/'
+if not os.path.exists(diff_base_dir):
+    os.mkdir(diff_base_dir)
+
 def run_job():
     # clang-modernize every file listed in the cmake compilation
     # database
@@ -45,10 +49,13 @@ def main(argv):
 
             # TODO: other validation
 
-            # TODO: delivery options
+            fname = "temp.diff"
+            git_diff_to_file(fname)
+            with open(fname, 'r') as ofile:
+                print ofile.read()
 
-            display_diff()
-
+            # TODO: move the diff file somewhere outside the temp directory
+            # and save it
         finally:
             # restore working dir
             os.chdir(origcwd)
