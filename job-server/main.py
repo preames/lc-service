@@ -68,7 +68,7 @@ def run_job(job):
     # TODO: remove shell=True via explicit command path
     if jobtype == "echo":
         print "echo: " + str(job)
-    elif jobtype == "build" or jobtype == "clang-modernize" or jobtype == "clang-tidy" or jobtype == "clang-format":
+    elif jobtype in ["build", "clang-modernize", "clang-tidy", "clang-format"]:
         repo = job.repo
         cmd = "python run-%s-job.py %s" % (jobtype, repo)
         subprocess.call(cmd, shell=True)

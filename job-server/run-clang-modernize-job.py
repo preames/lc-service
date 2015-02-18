@@ -15,6 +15,7 @@ def run_job():
                           shell=True)
 
 
+# TODO: pass the job configuration in via JSON?  Or just the request ID?
 def main(argv):
     assert len(argv) == 2
     repo = argv[1]
