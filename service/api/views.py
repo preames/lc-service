@@ -5,6 +5,7 @@ from models import *
 import json
 import datetime
 import logging
+import os
 
 # By default, any unmapped URL hits this and gets a page not found
 def index(request):
@@ -125,13 +126,19 @@ def stop(request):
 @csrf_exempt
 def diff(request):
     if request.method not in ['GET', 'POST']:
-        raise Http404
+        raise Http404('bad request type')
     if not request.REQUEST["id"]:
-        raise Http404
+        raise Http404("no id");
     tainted_id = request.REQUEST["id"]
     # TODO: validate user permissions to this id
     request = get_object_or_404(Request, id=tainted_id)
-
+    filename = request.diff_file 
+    if filename == "":
+        raise Http404("no file")
+    if not os.path.exists(filename):
+        raise Http404("missing file")
+    # TODO: validate that the file is somewhere we're willing to serve from
+    # as a last ditch security check.
     # As you can see, this is utterly insecure right now...
-    return DiffResponse('/proc/cpuinfo')
+    return DiffResponse(filename)
 

@@ -7,12 +7,14 @@ class Request(models.Model):
     datetime = models.DateTimeField('date requested')
     repo = models.URLField(max_length=512)
     parameters = models.TextField(default="{}")
+    diff_file = models.TextField(default='')
 
     def __str__(self):
         return ", ".join([str(self.id), 
                           str(self.datetime), 
                           str(self.repo),
-                          str(self.parameters)])
+                          str(self.parameters),
+                          str(self.diff_file)])
 
 class LogMessage(models.Model):
     # implicit 'id' primary key field
