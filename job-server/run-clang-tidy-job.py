@@ -11,7 +11,7 @@ def run_job():
     # clang-tidy every file listed in the cmake compilation
     # database
     for cmd in commands:
-         subprocess.check_call("/home/richard/dev/clang/git/my-build/bin/clang-tidy -p . -checks= -fix %s" % (cmd["file"]),
+         subprocess.check_call("clang-tidy -p . -checks= -fix %s" % (cmd["file"]),
                           shell=True)
 
 
