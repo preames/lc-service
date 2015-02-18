@@ -3,10 +3,15 @@ import subprocess
 import shutil
 import sys
 
+import multiprocessing
+cpu_count = multiprocessing.cpu_count()
+
 # really should use a three way here
 def try_make_target_impl(options, target):
     try:
-        output = subprocess.check_output("make %s %s" % (options, target),
+        num_threads = min(1,cpu_count-1)
+        output = subprocess.check_output("make -j %d %s %s" % (num_threads,
+                                                               options, target),
                                 stderr=subprocess.STDOUT,
                                 shell=True)
         if "No rule to make target" in output:
@@ -96,8 +101,19 @@ def clone_repository(repo, work_dir):
     subprocess.call(cmd, shell=True)
 
 
+def git_diff_to_file(fname):
+    subprocess.call("git --no-pager diff > %s" % (fname), shell=True)
+
+# TODO: inline this to callers
 def display_diff():
+    fname = "temp.diff"
+    git_diff_to_file(fname)
+    with open(fname, 'r') as ofile:
+        print ofile.read()
+
+def scratch_code():
     # TODO: multiple delivery options
+    # 0) downloadable diff file
     # 1) diff via email
     # 2) commit and push
     # 3) repo fork and pull request
@@ -105,6 +121,10 @@ def display_diff():
     #    formatted nicely, with raw patch for apply
     #    generate a json output file, parse this to make
     #    a pretty webpage later.  Put the diffs into own subtree
+    # 5) pull request on github
+    # 6) phabricator review
+    # 7) reviewboard review
+    # Current planned order: 0, 5, 7, ...
 
     output_format = "diff-web"
     if output_format == "diff-web":
