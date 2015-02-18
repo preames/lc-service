@@ -4,7 +4,7 @@ import subprocess
 import shutil
 import sys
 
-assert len(sys.argv) == 2
+assert len(sys.argv) == 3
 repo = sys.argv[1]
 
 def build_it():

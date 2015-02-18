@@ -70,7 +70,7 @@ def run_job(job):
         print "echo: " + str(job)
     elif jobtype in ["build", "clang-modernize", "clang-tidy", "clang-format"]:
         repo = job.repo
-        cmd = "python run-%s-job.py %s" % (jobtype, repo)
+        cmd = "python run-%s-job.py %s %s" % (jobtype, repo, job.id)
         subprocess.call(cmd, shell=True)
         pass
     else:

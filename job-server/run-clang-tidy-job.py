@@ -3,7 +3,7 @@ import os
 import subprocess
 import shutil
 import sys
-from common import create_working_dir, clone_repository, build_it, display_diff
+from common import create_working_dir, clone_repository, build_it, display_diff, , git_diff_to_file
 
 
 def run_job():
@@ -16,8 +16,9 @@ def run_job():
 
 
 def main(argv):
-    assert len(argv) == 2
+    assert len(argv) == 3
     repo = argv[1]
+    request_id = argv[2]
 
     print "Processing repository: %s" % repo
 

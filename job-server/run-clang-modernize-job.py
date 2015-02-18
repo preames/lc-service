@@ -2,7 +2,10 @@ import os
 import shutil
 import subprocess
 import sys
-from common import create_working_dir, clone_repository, build_it, display_diff
+from common import create_working_dir, clone_repository, build_it, display_diff, common_setup, git_diff_to_file
+
+common_setup()
+from api import models
 
 diff_base_dir = '/tmp/lc-diffs/'
 if not os.path.exists(diff_base_dir):
@@ -17,10 +20,13 @@ def run_job():
 
 # TODO: pass the job configuration in via JSON?  Or just the request ID?
 def main(argv):
-    assert len(argv) == 2
+    assert len(argv) == 3
     repo = argv[1]
+    request_id = argv[2]
+    request = models.Request.objects.get(pk=request_id)
 
     print "Processing repository: %s" % repo
+    print str(request)
 
     work_dir = ""
     try:
@@ -55,8 +61,16 @@ def main(argv):
             with open(fname, 'r') as ofile:
                 print ofile.read()
 
-            # TODO: move the diff file somewhere outside the temp directory
-            # and save it
+            
+            # save the diff file outside the temp directory so it doesn't get
+            # destroyed and publish that location in the request record
+            # TODO: should probably use a naming collision less prone to
+            # collisions when we reset the test database...
+            dst = diff_base_dir + str(request.id) + ".diff"
+            import shutil
+            shutil.move(fname, dst)
+            request.diff_file = dst
+            request.save()
         finally:
             # restore working dir
             os.chdir(origcwd)
