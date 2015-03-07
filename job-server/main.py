@@ -31,20 +31,24 @@ def pending_jobs():
         if action == "job_start":
             assert not message.request.id in jobs
             jobs[message.request.id] = True
-        elif action in ["job_started", "job_finished", "job_stop"]:
+        elif action in ["job_started", "job_finished", "job_stop", 'job_abort']:
             assert message.request.id in jobs
             jobs[message.request.id] = False
-        elif action in ["job_finished"]:
-            assert message.request.id in jobs
-            assert not jobs[message.request.id]
 
     for key, value in jobs.items():
         # A true value implies this job hasn't yet run...
         if value:
-            # TODO: shed if too old or load too high
-            # TODO: error handling
             request = models.Request.objects.get(pk=key)
             request.parameters = json.loads(request.parameters)
+
+            # shed load if the request is too old
+            starttime = request.datatime
+            too_old = datetime.datetime.now() - datatime.timedelta(hours=12)
+            if starttime < too_old:
+                message_dict = {"action": "job_abort"}
+                add_message_to_log(message_dict, request)
+                continue;
+
             yield request
 
 def run_job(job):
