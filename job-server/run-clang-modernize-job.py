@@ -1,6 +1,7 @@
+import json
 import os
-import shutil
 import subprocess
+import shutil
 import sys
 from common import create_working_dir, clone_repository, build_it, display_diff, common_setup, git_diff_to_file
 
