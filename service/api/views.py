@@ -42,6 +42,8 @@ def start(request):
     # TODO: validate the repository is actual a github url
     # validate it's in our whitelist (for now)
     if tainted_repo not in url_whitelist:
+        # TODO: log this to a file or table, or something
+        # we want to keep this list for later expansions/consideration
         raise Http404
 
     if "job_type" in request.REQUEST.keys():
@@ -54,7 +56,32 @@ def start(request):
         print 'Job type ' + job_type + ' unknown.'
         raise Http404
 
-    # TODO: should we try to combine with an existing pending job?
+    # Check to see if there's a pending job with the same repo and request type
+    # if there is, return that one so that we can combine work for two requests
+    # into one.  This is crtical for handling expected load when the 
+    # announcement goes out since the actual execution layer is pretty simple.
+    requests = Requests.objects.all().filter(repo=tainted_repo)
+    last_request = messages.order_by('pk').reverse()[0:1]
+    if last_requst:
+        messages = LogMessage.objects.all().filter(request=last_request)
+        finished = False
+        for message in messages:
+            data = json.loads(message.payload)
+            # not the right type of job. TODO: this field needs to be added 
+            # to the DB table!
+            if "job_type" in data and data["job_type"] != job_type:
+                break;
+            action = data["action"]
+            if action in ["job_finished", "job_stop", 'job_abort']:
+                finished = True
+                break
+        if not finished:
+            message_dict = {"action": "job_start", "job_type": job_type, "repository": tainted_repo }
+            message_dict["id"] = request.id
+            return JsonResponse(message_dict)
+        else:
+            # fall through and create a new request to be serviced
+            pass
 
     message_dict = {"action": "job_start", "job_type": job_type, "repository": tainted_repo }
     message_json = json.dumps(message_dict)
