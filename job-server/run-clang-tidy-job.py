@@ -3,7 +3,7 @@ import os
 import subprocess
 import shutil
 import sys
-from common import create_working_dir, clone_repository, build_it, display_diff, common_setup, git_diff_to_file
+from common import create_working_dir, clone_repository, build_it, display_diff, common_setup, git_diff_to_file, generate_compile_command_file
 
 common_setup()
 from api import models
@@ -41,22 +41,11 @@ def main(argv):
         try:
             os.chdir(work_dir)
 
-            if not build_it():
+            if not generate_compile_command_file():
                 print "initial build failed"
                 sys.exit(-1)
 
             run_job()
-
-            # TODO: if there is no diff, early exit
-
-            # do a full build and make sure it passes.  IF it doesn't, we
-            # don't want to keep this.  TODO: We'll need to be robust against
-            # failures in the future, but for now, don't mess with it.
-            if not build_it():
-                print "build failed after format"
-                sys.exit(-1)
-
-            # TODO: other validation
 
             fname = "temp.diff"
             git_diff_to_file(fname)
@@ -73,6 +62,25 @@ def main(argv):
             request.diff_file = dst
             request.save()
 
+            # Skip the build step if there's nothing for us to actually build
+            diff_file = request.diff_file
+            if "" == diff_file or not os.path.exists(diff_file):
+                print "no diff to build"
+                sys.exit(0)
+
+            with open(diff_file, 'r') as ofile:
+                if "" == ofile.read():
+                    print "diff is empty"
+                    sys.exit(0)
+
+            # do a full build and make sure it passes.  IF it doesn't, we
+            # don't want to keep this.  TODO: We'll need to be robust against
+            # failures in the future, but for now, don't mess with it.
+            if not build_it():
+                print "build failed after format"
+                sys.exit(-1)
+
+            # TODO: other validation
         finally:
             # restore working dir
             os.chdir(origcwd)

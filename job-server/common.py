@@ -58,6 +58,20 @@ def try_make_target(target):
 
 TrivialBuildSuccess = False
 
+def generate_compile_command_file():
+    # Run cmake to attempt to generate a compile_commands.json file.  We're
+    # assumed to be a temporary checkout.
+    if os.path.exists("./CMakeLists.txt"):
+        print "Running cmake"
+        if 0 != subprocess.call("cmake -D CMAKE_EXPORT_COMPILE_COMMANDS=true .", 
+                                shell=True,
+                                stderr = subprocess.STDOUT):
+            return False
+        return os.path.exists("compile_commands.json")
+    else:
+        return False
+
+
 # Try to build the local directory using standard build mechanisms
 def build_it(require_build=True, require_tests=False):
     if TrivialBuildSuccess:
