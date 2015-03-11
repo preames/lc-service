@@ -42,9 +42,10 @@ def pending_jobs():
             request.parameters = json.loads(request.parameters)
 
             # shed load if the request is too old
-            starttime = request.datatime
-            too_old = datetime.datetime.now() - datatime.timedelta(hours=12)
-            if starttime < too_old:
+            starttime = request.datetime
+            too_old = datetime.datetime.now() - datetime.timedelta(hours=12)
+            too_old = too_old.replace(tzinfo=None)
+            if starttime.replace(tzinfo=None) < too_old:
                 message_dict = {"action": "job_abort"}
                 add_message_to_log(message_dict, request)
                 continue;

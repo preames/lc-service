@@ -88,6 +88,7 @@ def main(argv):
         # cleanup the tmp repo
         print "Removing scratch directory: %s" % work_dir
         if os.path.exists(work_dir):
+            import shutil
             shutil.rmtree(work_dir)
 
 

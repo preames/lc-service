@@ -24,6 +24,34 @@ def DiffResponse(fname):
         response = HttpResponse(ofile.read(), content_type='text/plain')
         return response;
 
+def find_pending_request(url, job_type):
+    requests = Request.objects.all().filter(repo=url)
+    # search the last 5 since we're not keyed off the job_type (FIXME)
+    last_requests = requests.order_by('pk').reverse()[0:5]
+    for last_request in last_requests:
+        messages = LogMessage.objects.all().filter(request=last_request)
+        found = False
+        for message in messages:
+            data = json.loads(message.payload)
+            # not the right type of job. TODO: this field needs to be added 
+            # to the DB table!
+            if "job_type" in data:
+                if data["job_type"] == job_type:
+                    found = True
+                break;
+        if not found:
+            # keep searching for a job of right type
+            continue
+        # We found one of the right type, is it still running?
+        for message in messages:
+            data = json.loads(message.payload)
+            action = data["action"]
+            if action in ["job_finished", "job_stop", 'job_abort']:
+                return None;
+        return last_request
+    return None
+
+
 # Kick off a new request
 # TODO: figure out a better development solution than disabling CSRF
 @csrf_exempt
@@ -60,34 +88,17 @@ def start(request):
     # if there is, return that one so that we can combine work for two requests
     # into one.  This is crtical for handling expected load when the 
     # announcement goes out since the actual execution layer is pretty simple.
-    requests = Requests.objects.all().filter(repo=tainted_repo)
-    last_request = messages.order_by('pk').reverse()[0:1]
-    if last_requst:
-        messages = LogMessage.objects.all().filter(request=last_request)
-        finished = False
-        for message in messages:
-            data = json.loads(message.payload)
-            # not the right type of job. TODO: this field needs to be added 
-            # to the DB table!
-            if "job_type" in data and data["job_type"] != job_type:
-                break;
-            action = data["action"]
-            if action in ["job_finished", "job_stop", 'job_abort']:
-                finished = True
-                break
-        if not finished:
-            message_dict = {"action": "job_start", "job_type": job_type, "repository": tainted_repo }
-            message_dict["id"] = request.id
-            return JsonResponse(message_dict)
-        else:
-            # fall through and create a new request to be serviced
-            pass
-
-    message_dict = {"action": "job_start", "job_type": job_type, "repository": tainted_repo }
-    message_json = json.dumps(message_dict)
+    pending = find_pending_request(tainted_repo, job_type)
+    if pending:
+        message_dict = {"action": "job_start", "job_type": job_type, 
+                        "repository": tainted_repo, "id" : pending.id }
+        return JsonResponse(message_dict)
 
     # First, create a record in the request table for this job, then
     # actually send a message to the job server to request it be run
+    message_dict = {"action": "job_start", "job_type": job_type, 
+                    "repository": tainted_repo }
+    message_json = json.dumps(message_dict)
     request = Request.objects.create(datetime=datetime.datetime.now(),
                                      repo=tainted_repo,
                                      parameters=message_json)
